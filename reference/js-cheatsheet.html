@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>JS Cheatsheet — Exam Prep</title>
+<link rel="stylesheet" href="../assets/style.css">
+</head>
+<body>
+
+<div class="topbar">
+  <a class="home-link" href="../index.html">← Home</a>
+  <span class="brand">JavaScript Cheatsheet</span>
+  <nav>
+    <a href="js-cheatsheet.html" class="current">JS</a>
+    <a href="css-cheatsheet.html">CSS</a>
+    <a href="dom-live-playground.html">Playground</a>
+    <a href="pitfalls.html">Pitfalls</a>
+    <a href="mdn-links.html">MDN links</a>
+  </nav>
+</div>
+
+<main class="wrap">
+  <h1>JavaScript patterns for the exam</h1>
+  <p class="lede">Every snippet here is deliberately generic — swap <code>sampleData</code> or the API url for whatever the real brief gives you.</p>
+
+  <h2><span class="task-badge">1</span>Template literals + dot notation</h2>
+  <p>Backticks let you drop variables straight into a string with <code>${}</code>. Reading a property off an object uses a dot.</p>
+  <pre><div class="dots"><span></span><span></span><span></span></div><code>const sampleData = {
+  title: "The Lantern Orchard",
+  author: "Mere Kingsley",
+  year: 2019,
+};
+
+const featured = document.getElementById("featured");
+
+featured.innerHTML = `
+  &lt;h2&gt;${sampleData.title}&lt;/h2&gt;
+  &lt;p&gt;${sampleData.author} &middot; ${sampleData.year}&lt;/p&gt;
+`;</code></pre>
+  <div class="callout">
+    <strong>Why this matters</strong>
+    Everything inside <code>${ }</code> is real JavaScript, not just a variable name — so
+    <code>${sampleData.year + 1}</code> or <code>${sampleData.title.toUpperCase()}</code> both work fine.
+  </div>
+
+  <h2><span class="task-badge">3</span>Selecting elements &amp; toggling a class</h2>
+  <pre><div class="dots"><span></span><span></span><span></span></div><code>const button = document.getElementById("toggle-desc");
+const description = document.querySelector("#featured .description");
+
+button.addEventListener("click", () =&gt; {
+  description.classList.toggle("show");
+
+  if (description.classList.contains("show")) {
+    button.textContent = "Show less";
+  } else {
+    button.textContent = "Show more";
+  }
+});</code></pre>
+  <div class="callout warn">
+    <strong>Watch the selector</strong>
+    <code>querySelector("#featured .description")</code> means: inside the element with id
+    <code>featured</code>, find something with class <code>description</code>. Mixing up which class you
+    actually gave the element in your template literal is the single most common bug here —
+    the class name in your HTML string and the class name in your selector must match exactly.
+  </div>
+
+  <h2><span class="task-badge">4</span>async/await + fetch</h2>
+  <pre><div class="dots"><span></span><span></span><span></span></div><code>async function loadItems() {
+  const response = await fetch("API_URL_HERE");
+  const data = await response.json();
+
+  const grid = document.getElementById("card-grid");
+  let cards = "";
+
+  data.forEach((item) =&gt; {
+    cards += `
+      &lt;article class="card"&gt;
+        &lt;img src="${item.cover_url}" alt="Cover for ${item.title}"&gt;
+        &lt;h2&gt;${item.title}&lt;/h2&gt;
+        &lt;p class="description"&gt;${item.description}&lt;/p&gt;
+      &lt;/article&gt;
+    `;
+  });
+
+  grid.innerHTML = cards; // set ONCE, after the loop
+}
+
+loadItems(); // don't forget to actually call it</code></pre>
+  <div class="callout">
+    <strong>The two words that make this "async"</strong>
+    <code>async</code> on the function lets you use <code>await</code> inside it. <code>await</code> pauses
+    that line until the promise (the fetch, or the <code>.json()</code> parse) finishes. Forget <code>await</code>
+    and <code>data</code> will be a pending Promise object, not your array.
+  </div>
+  <div class="callout warn">
+    <strong>Build-then-assign, not assign-in-loop</strong>
+    Notice <code>cards</code> starts as an empty string, gets <code>+=</code> added to it on every pass, and
+    is only assigned to <code>innerHTML</code> once, after the loop ends. If you set <code>grid.innerHTML = cards</code>
+    <em>inside</em> the loop, every pass throws away everything built so far — you'll usually end up
+    with only the last item rendered.
+  </div>
+
+  <h2>for...of — the alternative to forEach</h2>
+  <pre><div class="dots"><span></span><span></span><span></span></div><code>for (const item of data) {
+  cards += `&lt;article class="card"&gt;${item.title}&lt;/article&gt;`;
+}</code></pre>
+  <p>Functionally identical to <code>.forEach()</code> here — use whichever you find easier to read under pressure.</p>
+
+  <h2><span class="task-badge">6</span>Listening for a checkbox change</h2>
+  <pre><div class="dots"><span></span><span></span><span></span></div><code>const checkbox = document.getElementById("show-descriptions");
+
+checkbox.addEventListener("change", () =&gt; {
+  // select these INSIDE the handler — the cards don't exist
+  // until loadItems() has already run once
+  const descriptions = document.querySelectorAll("#card-grid .description");
+
+  descriptions.forEach((description) =&gt; {
+    description.classList.toggle("show", checkbox.checked);
+  });
+});</code></pre>
+  <div class="callout warn">
+    <strong>querySelector vs. querySelectorAll</strong>
+    <code>querySelector</code> returns a single element (the first match) — it has no <code>.forEach</code>.
+    <code>querySelectorAll</code> returns a NodeList of every match, which <em>does</em> have <code>.forEach</code>.
+    Looping over multiple cards' descriptions always needs the <code>All</code> version.
+  </div>
+  <div class="callout">
+    <strong>classList.toggle's second argument</strong>
+    <code>classList.toggle("show")</code> flips the class on/off each call. <code>classList.toggle("show", checkbox.checked)</code>
+    forces it to match a boolean instead — much safer for a checkbox, since clicking twice fast can't get it out of sync.
+  </div>
+
+  <h2>Quick reference table</h2>
+  <table>
+    <tr><th>Need to...</th><th>Use</th></tr>
+    <tr><td>Get one element by its id</td><td><code>document.getElementById("id")</code></td></tr>
+    <tr><td>Get the first element matching a CSS selector</td><td><code>document.querySelector(".class")</code></td></tr>
+    <tr><td>Get every element matching a selector</td><td><code>document.querySelectorAll(".class")</code></td></tr>
+    <tr><td>Insert HTML you built as a string</td><td><code>el.innerHTML = htmlString</code></td></tr>
+    <tr><td>Change only the text inside an element</td><td><code>el.textContent = "new text"</code></td></tr>
+    <tr><td>Add / remove / flip a class</td><td><code>el.classList.add()</code> / <code>.remove()</code> / <code>.toggle()</code></td></tr>
+    <tr><td>React to a click</td><td><code>el.addEventListener("click", fn)</code></td></tr>
+    <tr><td>React to a checkbox / select changing</td><td><code>el.addEventListener("change", fn)</code></td></tr>
+    <tr><td>Fetch remote JSON</td><td><code>const r = await fetch(url); const d = await r.json();</code></td></tr>
+  </table>
+
+</main>
+
+<footer class="site">JS Cheatsheet · <a href="../index.html">Back to hub</a></footer>
+</body>
+</html>

@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Live Playground — Exam Prep</title>
+<link rel="stylesheet" href="../assets/style.css">
+<style>
+  .tabs { display: flex; gap: 6px; margin-bottom: 14px; }
+  .tab-btn {
+    background: var(--panel);
+    border: 1px solid var(--line);
+    color: var(--ink-soft);
+  }
+  .tab-btn.active {
+    background: var(--accent);
+    color: #fff;
+    border-color: var(--accent);
+  }
+  .tab-pane { display: none; }
+  .tab-pane.active { display: block; }
+
+  textarea#code-editor { min-height: 260px; }
+
+  .output-box {
+    background: var(--panel);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    padding: 16px 18px;
+    min-height: 90px;
+  }
+  .error-box {
+    background: #fbe9e7;
+    border: 1px solid #d98a7c;
+    color: #7a2d1f;
+    border-radius: var(--radius);
+    padding: 10px 14px;
+    font-family: var(--mono);
+    font-size: 0.85rem;
+    display: none;
+    margin-top: 10px;
+    white-space: pre-wrap;
+  }
+  .run-row { display: flex; gap: 10px; align-items: center; margin: 14px 0; }
+  .output-card {
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    padding: 12px 14px;
+    margin-bottom: 8px;
+    background: #fbfdfc;
+  }
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <a class="home-link" href="../index.html">← Home</a>
+  <span class="brand">Live Playground</span>
+  <nav>
+    <a href="js-cheatsheet.html">JS</a>
+    <a href="css-cheatsheet.html">CSS</a>
+    <a href="dom-live-playground.html" class="current">Playground</a>
+    <a href="pitfalls.html">Pitfalls</a>
+    <a href="mdn-links.html">MDN links</a>
+  </nav>
+</div>
+
+<main class="wrap">
+  <h1>Live code playground</h1>
+  <p class="lede">Real code, running in your browser. Edit anything, hit run, see what changes. Break it on purpose — that's how you find out what each part actually does.</p>
+
+  <div class="tabs">
+    <button class="tab-btn active" data-tab="template">Template literal practice</button>
+    <button class="tab-btn" data-tab="fetch">Fetch / async practice</button>
+  </div>
+
+  <!-- TAB 1: template literal -->
+  <div class="tab-pane active" id="tab-template">
+    <p>This builds one "featured item" the same way Task 1 does. Try changing a property name, breaking a <code>${}</code>, or changing the HTML structure.</p>
+    <textarea id="code-editor-template" spellcheck="false">const sampleData = {
+  title: "Midnight in the Fernery",
+  author: "Talia Wren",
+  year: 2021,
+  genre: "Mystery",
+  description: "A botanist disappears from a locked glasshouse."
+};
+
+return `
+  &lt;h2&gt;${sampleData.title}&lt;/h2&gt;
+  &lt;p class="meta"&gt;${sampleData.author} &middot; ${sampleData.year} &middot; ${sampleData.genre}&lt;/p&gt;
+  &lt;p class="description"&gt;${sampleData.description}&lt;/p&gt;
+`;</textarea>
+    <div class="run-row">
+      <button id="run-template">▶ Run</button>
+      <button class="secondary" id="reset-template">Reset</button>
+    </div>
+    <div class="error-box" id="error-template"></div>
+    <h3>Output</h3>
+    <div class="output-box" id="output-template"></div>
+  </div>
+
+  <!-- TAB 2: fetch/async -->
+  <div class="tab-pane" id="tab-fetch">
+    <p>
+      There's no internet call here — <code>fakeFetch()</code> below returns a Promise after a short delay,
+      exactly like a real <code>fetch()</code> would. The point is to practice the <code>async</code>/<code>await</code>/loop
+      pattern itself, which is identical either way.
+    </p>
+    <textarea id="code-editor-fetch" spellcheck="false">async function run() {
+  const data = await fakeFetch();
+
+  let cards = "";
+  data.forEach((item) =&gt; {
+    cards += `
+      &lt;div class="output-card"&gt;
+        &lt;strong&gt;${item.title}&lt;/strong&gt; — ${item.year}
+      &lt;/div&gt;
+    `;
+  });
+
+  return cards;
+}
+
+return run();</textarea>
+    <div class="run-row">
+      <button id="run-fetch">▶ Run</button>
+      <button class="secondary" id="reset-fetch">Reset</button>
+    </div>
+    <div class="error-box" id="error-fetch"></div>
+    <h3>Output</h3>
+    <div class="output-box" id="output-fetch">Click run — fakeFetch takes about half a second, just like a real request.</div>
+  </div>
+
+</main>
+
+<footer class="site">Live Playground · <a href="../index.html">Back to hub</a></footer>
+
+<script>
+  // --- tab switching ---
+  document.querySelectorAll(".tab-btn").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      document.querySelectorAll(".tab-btn").forEach((b) => b.classList.remove("active"));
+      document.querySelectorAll(".tab-pane").forEach((p) => p.classList.remove("active"));
+      btn.classList.add("active");
+      document.getElementById("tab-" + btn.dataset.tab).classList.add("active");
+    });
+  });
+
+  // --- fake API for the fetch tab ---
+  function fakeFetch() {
+    const items = [
+      { title: "Midnight in the Fernery", year: 2021 },
+      { title: "The Long Ferry Home", year: 2018 },
+      { title: "Salt and Static", year: 2023 },
+    ];
+    return new Promise((resolve) => setTimeout(() => resolve(items), 500));
+  }
+
+  // --- template literal tab ---
+  const templateDefault = document.getElementById("code-editor-template").value;
+  document.getElementById("run-template").addEventListener("click", () => {
+    const code = document.getElementById("code-editor-template").value;
+    const errBox = document.getElementById("error-template");
+    const outBox = document.getElementById("output-template");
+    errBox.style.display = "none";
+    try {
+      const fn = new Function(code);
+      const result = fn();
+      outBox.innerHTML = result;
+    } catch (err) {
+      errBox.textContent = err.message;
+      errBox.style.display = "block";
+    }
+  });
+  document.getElementById("reset-template").addEventListener("click", () => {
+    document.getElementById("code-editor-template").value = templateDefault;
+  });
+
+  // --- fetch/async tab ---
+  const fetchDefault = document.getElementById("code-editor-fetch").value;
+  document.getElementById("run-fetch").addEventListener("click", async () => {
+    const code = document.getElementById("code-editor-fetch").value;
+    const errBox = document.getElementById("error-fetch");
+    const outBox = document.getElementById("output-fetch");
+    errBox.style.display = "none";
+    outBox.textContent = "Running…";
+    try {
+      const fn = new Function("fakeFetch", code);
+      const result = await fn(fakeFetch);
+      outBox.innerHTML = result;
+    } catch (err) {
+      errBox.textContent = err.message;
+      errBox.style.display = "block";
+      outBox.textContent = "";
+    }
+  });
+  document.getElementById("reset-fetch").addEventListener("click", () => {
+    document.getElementById("code-editor-fetch").value = fetchDefault;
+  });
+</script>
+</body>
+</html>

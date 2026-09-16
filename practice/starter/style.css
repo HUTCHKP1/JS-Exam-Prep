@@ -1,0 +1,20 @@
+/* Task 2 and Task 5: your styles go here.
+
+   Use these colours so it's a fair drill (different palette to your
+   real exam mockup on purpose - the point is to practice APPLYING
+   the rules, not memorising one set of hex codes):
+
+   Page background (body)          #eef2ec
+   Header and footer background    #2e3b2f
+   Header and footer text          #ffffff
+   Featured panel and card bg      #ffffff
+   Button background               #c98a2c
+   Body text                       #23281f
+
+   Reminders:
+   - #featured: display: flex, gap, cover image fixed width ~180px, don't stretch
+   - .description: display: none by default; add a class that reveals it
+   - #card-grid: display: grid, grid-template-columns: repeat(_, 1fr), gap
+   - .card: flex column, background, padding, border-radius
+   - .card img: fixed width ~140px, height auto
+*/

@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Common Pitfalls — Exam Prep</title>
+<link rel="stylesheet" href="../assets/style.css">
+</head>
+<body>
+
+<div class="topbar">
+  <a class="home-link" href="../index.html">← Home</a>
+  <span class="brand">Common Pitfalls</span>
+  <nav>
+    <a href="js-cheatsheet.html">JS</a>
+    <a href="css-cheatsheet.html">CSS</a>
+    <a href="dom-live-playground.html">Playground</a>
+    <a href="pitfalls.html" class="current">Pitfalls</a>
+    <a href="mdn-links.html">MDN links</a>
+  </nav>
+</div>
+
+<main class="wrap">
+  <h1>Bugs that actually show up in this task</h1>
+  <p class="lede">These are the specific, repeatable mistakes worth checking for yourself before you submit each task — not a full debugging course, just the handful of things that cost the most marks for the least effort to catch.</p>
+
+  <h2>CSS</h2>
+
+  <div class="callout warn">
+    <strong>Missing dot before a class name</strong>
+    <code>description.show { display: block; }</code> targets an element whose <em>tag name</em> is
+    <code>&lt;description&gt;</code> — which doesn't exist — combined with class <code>show</code>. It will never
+    match anything and the rule silently does nothing. You want <code>.description.show</code>.
+    If a toggle changes the button text but the content never actually appears, this is the first thing to check.
+  </div>
+
+  <div class="callout warn">
+    <strong>Rule order / specificity fighting itself</strong>
+    If you write a general rule (<code>.description { display: none; }</code>) and a more specific one
+    elsewhere (<code>#featured .description { display: block; }</code>), the more specific selector wins
+    regardless of order in the file. Keep your hide/show rules as similar in specificity as possible
+    (e.g. <code>.description</code> and <code>.description.show</code>) so toggling a class is guaranteed to work.
+  </div>
+
+  <h2>JavaScript</h2>
+
+  <div class="callout warn">
+    <strong>querySelector vs. querySelectorAll</strong>
+    <code>document.querySelector(...)</code> always returns a single element (or <code>null</code>), never a list.
+    Calling <code>.forEach</code> on it throws <code>TypeError: ... .forEach is not a function</code>. Anywhere
+    you need to loop over more than one matching element — like every card's description in Task 6 —
+    you need <code>querySelectorAll</code>.
+  </div>
+
+  <div class="callout warn">
+    <strong>Selector doesn't match the class you actually gave the element</strong>
+    It's easy to build an element with <code>class="description"</code> in your template literal, then later
+    write <code>document.querySelector("#featured .featured")</code> or similar by accident when copy-pasting
+    between tasks. The class name inside your HTML string and the class name inside your selector are two
+    separate pieces of text that have to match exactly — nothing checks this for you until it silently fails at runtime.
+  </div>
+
+  <div class="callout warn">
+    <strong>Selecting elements before they exist</strong>
+    The cards from Task 4 don't exist in the DOM until the fetch has resolved and <code>innerHTML</code> has
+    been set. If your Task 6 checkbox listener selects <code>.card .description</code> at the top of the file
+    (outside any function), it will find nothing, because that code ran before <code>loadItems()</code> finished.
+    Select inside the event handler instead, so the lookup happens at click/change time, not at page-load time.
+  </div>
+
+  <div class="callout warn">
+    <strong>Rebuilding innerHTML inside the loop</strong>
+    <code>grid.innerHTML = cards;</code> placed <em>inside</em> a <code>forEach</code>/<code>for...of</code> loop
+    overwrites the whole grid on every single pass. Because <code>cards</code> keeps growing correctly outside
+    the DOM, the page will often visually show only the very last card once the loop finishes, even though your
+    string-building logic was fine. Build the full string first, assign it once, after the loop.
+  </div>
+
+  <div class="callout warn">
+    <strong>Forgetting <code>await</code></strong>
+    Both <code>fetch(url)</code> and <code>response.json()</code> return Promises. Without <code>await</code> in
+    front of each, you get a Promise object instead of the data itself, and trying to <code>.forEach</code> over
+    it or read a property off it fails.
+  </div>
+
+  <div class="callout warn">
+    <strong>Function defined but never called</strong>
+    Writing <code>async function loadItems() { ... }</code> does nothing on its own — the last line still needs
+    to be <code>loadItems();</code> to actually run it on page load.
+  </div>
+
+  <h2>HTML</h2>
+
+  <div class="callout warn">
+    <strong>Generic <code>alt</code> text</strong>
+    <code>alt="image"</code> or <code>alt="cover"</code> technically satisfies "has an alt attribute" but not
+    "describes the image" — markers usually check for an actual description of what's shown, not just presence
+    of the attribute.
+  </div>
+
+  <div class="callout warn">
+    <strong>Event listener attached before the element exists</strong>
+    If a button is created dynamically inside a template literal (like the Task 3 "show more" button), any
+    <code>addEventListener</code> call for it must run <em>after</em> that template literal has been written
+    into the page with <code>innerHTML</code> — not before. Order of operations in the file matters.
+  </div>
+
+  <h2>Git</h2>
+
+  <div class="callout warn">
+    <strong>One giant commit at the end</strong>
+    A single end-of-exam commit typically earns no marks for the workflow task even if the code is perfect —
+    the requirement is usually about the <em>history</em> (one commit per task, descriptive messages), not just
+    the final state of the code. Commit as you finish each task, with a message describing what changed.
+  </div>
+
+</main>
+
+<footer class="site">Common Pitfalls · <a href="../index.html">Back to hub</a></footer>
+</body>
+</html>

@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Exam Prep Toolkit</title>
+<link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+
+<div class="topbar">
+  <span class="brand">📚 Exam Prep Toolkit</span>
+  <nav>
+    <a href="index.html" class="current">Home</a>
+    <a href="reference/js-cheatsheet.html">JS Cheatsheet</a>
+    <a href="reference/css-cheatsheet.html">CSS Cheatsheet</a>
+    <a href="reference/dom-live-playground.html">Playground</a>
+    <a href="practice/index.html">Practice run</a>
+    <a href="quiz.html">Quiz</a>
+  </nav>
+</div>
+
+<main class="wrap">
+
+  <h1>Web Dev practical exam — revision toolkit</h1>
+  <p class="lede">
+    Built around the same shape as your practice SBA: a featured item panel plus a
+    fetched card grid. Everything here is static HTML/CSS/JS — no build step,
+    no internet connection required, so it'll work exactly the same on exam day.
+  </p>
+
+  <div class="callout warn">
+    <strong>Exam-day rule check</strong>
+    You can use local notes, MDN and CSS-Tricks during the exam — but not AI
+    tools. Use this toolkit <em>now</em> to actually learn the patterns, so that
+    tomorrow you're recalling code you understand, not searching for code to copy.
+  </div>
+
+  <h2>Study tools</h2>
+  <div class="grid-cards">
+
+    <a class="tool-card" href="reference/js-cheatsheet.html">
+      <span class="kicker">reference</span>
+      <h3>JavaScript cheatsheet</h3>
+      <p>Template literals, fetch/async, loops, querySelector, classList, event listeners — the exact patterns the brief asks for.</p>
+    </a>
+
+    <a class="tool-card" href="reference/css-cheatsheet.html">
+      <span class="kicker">reference</span>
+      <h3>CSS cheatsheet</h3>
+      <p>Flexbox for the featured panel, Grid + repeat() for the card grid, and the show/hide-with-a-class trick.</p>
+    </a>
+
+    <a class="tool-card" href="reference/dom-live-playground.html">
+      <span class="kicker">interactive</span>
+      <h3>Live code playground</h3>
+      <p>Edit real template-literal and fetch/async code in the browser and see it render immediately. No install needed.</p>
+    </a>
+
+    <a class="tool-card" href="quiz.html">
+      <span class="kicker">self-test</span>
+      <h3>Concept quiz</h3>
+      <p>20 quick recall questions covering the tricky bits — selectors, async, and CSS specificity gotchas.</p>
+    </a>
+
+    <a class="tool-card" href="practice/starter/index.html">
+      <span class="kicker">practice</span>
+      <h3>Full mock run (starter)</h3>
+      <p>The same 7-task structure, different data (recipes, not books). Attempt it cold, then check the model solution.</p>
+    </a>
+
+    <a class="tool-card" href="practice/solution/index.html">
+      <span class="kicker">practice</span>
+      <h3>Full mock run (solution)</h3>
+      <p>A completed reference version of the mock run — compare your attempt against a working pattern, don't just copy it.</p>
+    </a>
+
+    <a class="tool-card" href="reference/pitfalls.html">
+      <span class="kicker">notes</span>
+      <h3>Common pitfalls</h3>
+      <p>The bugs that actually show up in this kind of task — a missing dot in a CSS selector, querySelector vs. All, and more.</p>
+    </a>
+
+    <a class="tool-card" href="reference/mdn-links.html">
+      <span class="kicker">allowed on exam day</span>
+      <h3>MDN / CSS-Tricks shortlist</h3>
+      <p>Direct links to the exact pages you'd actually need — no digging through search results mid-exam.</p>
+    </a>
+
+  </div>
+
+  <h2>Task checklist</h2>
+  <p class="lede">Generic version of the 7-task shape so you can drill the order of operations. Ticks are saved in this browser only.</p>
+
+  <div class="panel">
+    <ul class="checklist">
+      <li>
+        <input type="checkbox" data-id="t1a" id="t1a">
+        <label class="task-text" for="t1a"><span class="task-badge">1</span>Semantic HTML shell: header (h1), main, footer (name + ID), title, link + script tags</label>
+        <span class="task-marks"></span>
+      </li>
+      <li>
+        <input type="checkbox" data-id="t1b" id="t1b">
+        <label class="task-text" for="t1b"><span class="task-badge">1</span>Featured item built as a template literal off <code>sampleData</code>, written into <code>#featured</code> with <code>innerHTML</code></label>
+      </li>
+      <li>
+        <input type="checkbox" data-id="t2" id="t2">
+        <label class="task-text" for="t2"><span class="task-badge">2</span>Featured item CSS: flex row, gap, fixed image width, <code>.description</code> hidden by default, header/footer colours</label>
+      </li>
+      <li>
+        <input type="checkbox" data-id="t3" id="t3">
+        <label class="task-text" for="t3"><span class="task-badge">3</span>Show more/less button: <code>classList.toggle</code> + <code>textContent</code> swap, listener added <em>after</em> featured HTML exists</label>
+      </li>
+      <li>
+        <input type="checkbox" data-id="t4" id="t4">
+        <label class="task-text" for="t4"><span class="task-badge">4</span>async/await fetch, loop with <code>forEach</code>/<code>for...of</code>, string built with <code>+=</code>, <code>innerHTML</code> set once after the loop, function called on load</label>
+      </li>
+      <li>
+        <input type="checkbox" data-id="t5" id="t5">
+        <label class="task-text" for="t5"><span class="task-badge">5</span>Grid CSS: <code>display: grid</code>, <code>repeat()</code> columns, gap; each <code>.card</code> a column flex box with padding + radius</label>
+      </li>
+      <li>
+        <input type="checkbox" data-id="t6" id="t6">
+        <label class="task-text" for="t6"><span class="task-badge">6</span>Checkbox + label above the grid; <code>change</code> listener selects card descriptions <em>inside the handler</em> and toggles a class</label>
+      </li>
+      <li>
+        <input type="checkbox" data-id="t7" id="t7">
+        <label class="task-text" for="t7"><span class="task-badge">7</span>Commit after every task, descriptive messages, 5+ commits total</label>
+      </li>
+    </ul>
+  </div>
+
+  <button class="secondary" id="reset-checklist">Reset checklist</button>
+
+</main>
+
+<footer class="site">Built for revision only — know the code before the exam, since you won't have this tomorrow.</footer>
+
+<script src="assets/checklist.js"></script>
+</body>
+</html>

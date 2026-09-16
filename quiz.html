@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Concept Quiz — Exam Prep</title>
+<link rel="stylesheet" href="assets/style.css">
+<style>
+  .q { margin-bottom: 26px; }
+  .q p.prompt { font-weight: 600; margin-bottom: 10px; }
+  .options { display: flex; flex-direction: column; gap: 8px; }
+  .option {
+    display: flex; align-items: center; gap: 10px;
+    background: var(--panel); border: 1px solid var(--line);
+    border-radius: 8px; padding: 10px 14px; cursor: pointer;
+  }
+  .option:hover { border-color: var(--accent); }
+  .option input { accent-color: var(--accent); }
+  .option.correct { border-color: #3c8f5b; background: #e9f6ee; }
+  .option.incorrect { border-color: #c65a4a; background: #fbebe8; }
+  .q .feedback { margin-top: 8px; font-size: 0.88rem; color: var(--ink-soft); display: none; }
+  #score-panel { display: none; text-align: center; }
+  #score-panel .big-score { font-size: 2.4rem; font-family: var(--mono); color: var(--accent-deep); }
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <a class="home-link" href="index.html">← Home</a>
+  <span class="brand">Concept Quiz</span>
+  <nav><a href="index.html">Home</a></nav>
+</div>
+
+<main class="wrap">
+  <h1>20-question self-test</h1>
+  <p class="lede">Answer everything, then hit "Mark my answers" at the bottom. Nothing is recorded anywhere — refresh to reset.</p>
+
+  <div id="quiz-body"></div>
+
+  <div class="run-row" style="margin: 20px 0;">
+    <button id="mark-btn">Mark my answers</button>
+    <button class="secondary" id="retry-btn" style="display:none;">Try again</button>
+  </div>
+
+  <div id="score-panel" class="panel">
+    <div class="big-score" id="score-text">0 / 20</div>
+    <p id="score-msg"></p>
+  </div>
+</main>
+
+<footer class="site">Concept Quiz · <a href="index.html">Back to hub</a></footer>
+
+<script>
+const QUESTIONS = [
+  {
+    q: "Which syntax lets you insert a variable directly inside a string?",
+    options: ["Template literals with backticks and ${}", "String.concat() only", "JSON.stringify()", "The + operator only"],
+    correct: 0,
+    explain: "Backtick strings with ${expression} are template literals — the only one of these that embeds a value inline."
+  },
+  {
+    q: "What does document.querySelector('#featured .description') select?",
+    options: [
+      "Every element with class 'description' anywhere on the page",
+      "The first element with class 'description' inside the element with id 'featured'",
+      "An element with both id 'featured' and class 'description'",
+      "Nothing — this is invalid syntax"
+    ],
+    correct: 1,
+    explain: "A space in a selector means descendant: match .description elements found inside #featured."
+  },
+  {
+    q: "You need to loop through a NodeList and toggle a class on each item. Which method should you use to select them?",
+    options: ["document.querySelector()", "document.getElementById()", "document.querySelectorAll()", "document.getElementsByTagName() only"],
+    correct: 2,
+    explain: "querySelectorAll returns a NodeList, which supports .forEach(). querySelector only ever returns one element."
+  },
+  {
+    q: "What's wrong with this CSS: description.show { display: block; } ?",
+    options: [
+      "Nothing, it's correct",
+      "It's missing a leading dot before 'description' — it targets a non-existent <description> tag instead of a class",
+      "display: block is not a valid value",
+      "You can't chain two selectors like this at all"
+    ],
+    correct: 1,
+    explain: "Without the leading dot, 'description' is read as an element/tag name, not a class — the rule matches nothing."
+  },
+  {
+    q: "In an async function, what does 'await' actually do?",
+    options: [
+      "Pauses execution of that function until the Promise resolves",
+      "Runs the following code in a separate thread",
+      "Skips the following line entirely",
+      "Converts a synchronous function into JSON"
+    ],
+    correct: 0,
+    explain: "await pauses just that function (without blocking the rest of the page) until the awaited Promise settles."
+  },
+  {
+    q: "Where should grid.innerHTML = cards; go, relative to your forEach loop that builds 'cards'?",
+    options: [
+      "Inside the loop, on every iteration",
+      "Before the loop starts",
+      "After the loop has finished, exactly once",
+      "It doesn't matter"
+    ],
+    correct: 2,
+    explain: "Assigning inside the loop rebuilds (and effectively discards) everything on every pass. Assign once, after the loop."
+  },
+  {
+    q: "Which CSS makes three equal-width columns?",
+    options: [
+      "display: flex; flex-wrap: wrap;",
+      "grid-template-columns: repeat(3, 1fr);",
+      "columns: 3;",
+      "display: grid; grid-gap: 3;"
+    ],
+    correct: 1,
+    explain: "repeat(3, 1fr) inside grid-template-columns creates exactly three equal fractional-width columns."
+  },
+  {
+    q: "What does classList.toggle('show', checkbox.checked) do, compared to classList.toggle('show')?",
+    options: [
+      "Nothing different, the second argument is ignored",
+      "It removes the class entirely, ignoring the boolean",
+      "It forces the class to match the boolean instead of flipping it each call",
+      "It throws an error — toggle only accepts one argument"
+    ],
+    correct: 2,
+    explain: "The optional second argument forces add (true) or remove (false), rather than flipping on every call."
+  },
+  {
+    q: "You want to change a button's visible label without destroying its event listener. What should you set?",
+    options: ["button.innerHTML", "button.textContent", "button.outerHTML", "button.value"],
+    correct: 1,
+    explain: "textContent only updates the text node inside the button — innerHTML would recreate its contents and can detach listeners on children."
+  },
+  {
+    q: "Why might document.querySelectorAll('#card-grid .description') return an empty list if called at the very top of script.js (outside any function)?",
+    options: [
+      "The selector syntax is wrong",
+      "The cards haven't been added to the page yet — that code runs before the fetch has completed",
+      "querySelectorAll can't be used with ids",
+      "You can only call it once per page"
+    ],
+    correct: 1,
+    explain: "If it runs before your async fetch function resolves and fills #card-grid, there's nothing there yet to match."
+  },
+  {
+    q: "What's the correct order for the two fetch-related awaits?",
+    options: [
+      "await response.json(); then await fetch(url);",
+      "await fetch(url); then await response.json();",
+      "Only fetch needs await, json() runs instantly",
+      "Only json() needs await, fetch runs instantly"
+    ],
+    correct: 1,
+    explain: "You must await the fetch to get a response object, then await .json() on that response to get the parsed data."
+  },
+  {
+    q: "flex-shrink: 0 on an image inside a flex row does what?",
+    options: [
+      "Makes the image invisible",
+      "Stops the image being squashed smaller when space is tight",
+      "Forces the image to grow to fill space",
+      "Removes the image from the flex layout entirely"
+    ],
+    correct: 1,
+    explain: "By default flex items can shrink. Setting flex-shrink: 0 keeps the image at its set width regardless of available space."
+  },
+  {
+    q: "flex: 1 on an element inside a flex container means...",
+    options: [
+      "It takes exactly 1 pixel of width",
+      "It grows to take up the remaining available space",
+      "It's positioned absolutely",
+      "It disables flex behaviour for that child"
+    ],
+    correct: 1,
+    explain: "flex: 1 is shorthand that lets the item grow and shrink to fill the leftover space in the row."
+  },
+  {
+    q: "Which loop construct is NOT typically used to iterate an array of fetched items in this kind of task?",
+    options: ["array.forEach(item => {...})", "for (const item of array) {...}", "for (let i = 0; i < array.length; i++) {...}", "array.querySelector(item => {...})"],
+    correct: 3,
+    explain: "querySelector isn't an array iteration method at all — it selects DOM elements, not array items."
+  },
+  {
+    q: "A checkbox's 'change' event fires when...",
+    options: [
+      "The page first loads",
+      "The mouse hovers over the checkbox",
+      "Its checked state is toggled by the user",
+      "Every time the whole page reflows"
+    ],
+    correct: 2,
+    explain: "'change' fires when the checkbox is ticked or unticked — the standard event for that input type."
+  },
+  {
+    q: "What HTML attribute should meaningfully describe what an image shows, not just say 'image' or 'cover'?",
+    options: ["title", "alt", "src", "longdesc"],
+    correct: 1,
+    explain: "alt text should describe the actual content of the image for accessibility — generic text technically exists but doesn't do the job."
+  },
+  {
+    q: "Why does a single end-of-exam commit typically score poorly on a Git-workflow task?",
+    options: [
+      "Git doesn't allow single commits",
+      "The task usually assesses commit history/frequency, not just the final code",
+      "It causes a merge conflict",
+      "It deletes previous work"
+    ],
+    correct: 1,
+    explain: "Workflow marks are usually about incremental, descriptive commits made throughout — not just what the final state looks like."
+  },
+  {
+    q: "Where should you attach the click listener for a button that your JavaScript creates via a template literal?",
+    options: [
+      "Anywhere — order never matters in JavaScript",
+      "Before the template literal runs",
+      "After the innerHTML containing that button has actually been set",
+      "Inside the CSS file"
+    ],
+    correct: 2,
+    explain: "The button doesn't exist in the DOM until the innerHTML assignment runs, so the listener must be attached after that line."
+  },
+  {
+    q: "What does '+=' do when building an HTML string across a loop?",
+    options: [
+      "Overwrites the string on every pass",
+      "Appends the new content onto the existing string value",
+      "Only works on numbers",
+      "Clears the string"
+    ],
+    correct: 1,
+    explain: "+= appends to the existing string, which is exactly why you build the whole thing before assigning it to innerHTML once."
+  },
+  {
+    q: "Which pair of selectors correctly hides-by-default then reveals-on-toggle?",
+    options: [
+      ".description.show { display: none; } .description { display: block; }",
+      ".description { display: none; } .description.show { display: block; }",
+      "description { display: none; } description.show { display: block; }",
+      ".description, .show { display: none; }"
+    ],
+    correct: 1,
+    explain: "Base rule hides by default; a more specific rule with the extra 'show' class overrides it to reveal."
+  }
+];
+
+const body = document.getElementById("quiz-body");
+
+QUESTIONS.forEach((item, qi) => {
+  const qDiv = document.createElement("div");
+  qDiv.className = "q";
+  qDiv.dataset.correct = item.correct;
+
+  const p = document.createElement("p");
+  p.className = "prompt";
+  p.textContent = `${qi + 1}. ${item.q}`;
+  qDiv.appendChild(p);
+
+  const opts = document.createElement("div");
+  opts.className = "options";
+
+  item.options.forEach((optText, oi) => {
+    const label = document.createElement("label");
+    label.className = "option";
+    label.dataset.index = oi;
+    label.innerHTML = `<input type="radio" name="q${qi}" value="${oi}"> <span>${optText}</span>`;
+    opts.appendChild(label);
+  });
+
+  const feedback = document.createElement("p");
+  feedback.className = "feedback";
+  feedback.textContent = item.explain;
+
+  qDiv.appendChild(opts);
+  qDiv.appendChild(feedback);
+  body.appendChild(qDiv);
+});
+
+document.getElementById("mark-btn").addEventListener("click", () => {
+  let score = 0;
+
+  document.querySelectorAll(".q").forEach((qDiv) => {
+    const correctIndex = Number(qDiv.dataset.correct);
+    const selected = qDiv.querySelector("input[type='radio']:checked");
+    const options = qDiv.querySelectorAll(".option");
+
+    options.forEach((opt) => {
+      opt.classList.remove("correct", "incorrect");
+      opt.querySelector("input").disabled = true;
+    });
+
+    options[correctIndex].classList.add("correct");
+
+    if (selected) {
+      const selIndex = Number(selected.value);
+      if (selIndex === correctIndex) {
+        score++;
+      } else {
+        options[selIndex].closest(".option").classList.add("incorrect");
+      }
+    }
+
+    qDiv.querySelector(".feedback").style.display = "block";
+  });
+
+  document.getElementById("score-panel").style.display = "block";
+  document.getElementById("score-text").textContent = `${score} / ${QUESTIONS.length}`;
+  const msg = document.getElementById("score-msg");
+  if (score === QUESTIONS.length) {
+    msg.textContent = "Clean sweep. Go double-check the live playground and you're set.";
+  } else if (score >= QUESTIONS.length * 0.7) {
+    msg.textContent = "Solid. Reread the explanations above for anything you missed.";
+  } else {
+    msg.textContent = "Worth another pass through the cheatsheets before tomorrow — check the highlighted answers above.";
+  }
+  document.getElementById("score-panel").scrollIntoView({ behavior: "smooth" });
+  document.getElementById("mark-btn").style.display = "none";
+  document.getElementById("retry-btn").style.display = "inline-block";
+});
+
+document.getElementById("retry-btn").addEventListener("click", () => location.reload());
+</script>
+</body>
+</html>

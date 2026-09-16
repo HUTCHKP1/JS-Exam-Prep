@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mock Practice Run — Exam Prep</title>
+<link rel="stylesheet" href="../assets/style.css">
+</head>
+<body>
+
+<div class="topbar">
+  <a class="home-link" href="../index.html">← Home</a>
+  <span class="brand">Mock Practice Run</span>
+  <nav>
+    <a href="../reference/js-cheatsheet.html">JS</a>
+    <a href="../reference/css-cheatsheet.html">CSS</a>
+    <a href="starter/index.html">Open starter</a>
+    <a href="solution/index.html">Open solution</a>
+  </nav>
+</div>
+
+<main class="wrap">
+  <h1>Full mock run — Recipe Box</h1>
+  <p class="lede">
+    Same seven-task shape as the real brief, different theme (recipes, not books),
+    so you're drilling the pattern rather than the specific answer. Time yourself:
+    45–60 minutes, no AI, cheatsheets and MDN only.
+  </p>
+
+  <div class="callout">
+    <strong>How to use this</strong>
+    Open <code>starter/index.html</code> in your editor, build it from scratch, then
+    open <code>solution/index.html</code> to compare. Don't peek at the solution first —
+    the value here is in getting stuck and working through it.
+  </div>
+
+  <div class="two-col">
+    <a class="tool-card" href="starter/index.html">
+      <span class="kicker">attempt this first</span>
+      <h3>Starter files →</h3>
+      <p>Mostly-empty HTML/CSS, task comments already in <code>script.js</code>, data provided in <code>data.js</code>.</p>
+    </a>
+    <a class="tool-card" href="solution/index.html">
+      <span class="kicker">check afterwards</span>
+      <h3>Solution files →</h3>
+      <p>A fully working reference version — compare your attempt, don't just copy it.</p>
+    </a>
+  </div>
+
+  <h2><span class="task-badge">1</span>HTML structure + featured item</h2>
+  <p><code>header</code> (h1) · <code>main</code> wraps both sections · <code>footer</code> (name + ID) · title · stylesheet link · script tags. Inside main: <code>#featured</code> and <code>#card-grid</code>. Build the featured item from <code>FEATURED_RECIPE</code> as a template literal via <code>innerHTML</code>.</p>
+
+  <h2><span class="task-badge">2</span>CSS: featured item</h2>
+  <p><code>display: flex</code> on <code>#featured</code>, gap, fixed-width cover that doesn't stretch, <code>.description</code> hidden by default, header/footer styling, page background. Colour table is in <code>starter/style.css</code>.</p>
+
+  <h2><span class="task-badge">3</span>JS: show more / show less</h2>
+  <p>Click listener toggles a class on <code>.description</code> and swaps <code>textContent</code>. Attach it <em>after</em> the featured item's <code>innerHTML</code> is set.</p>
+
+  <h2><span class="task-badge">4</span>JS: fetch and render cards</h2>
+  <p><code>async</code> function awaits <code>fakeFetchRecipes()</code>, loops, builds each card with <code>+=</code>, assigns <code>innerHTML</code> once after the loop, gets called on load.</p>
+
+  <h2><span class="task-badge">5</span>CSS: card grid layout</h2>
+  <p><code>#card-grid</code> as a grid with <code>repeat()</code> columns and gap. Each <code>.card</code> a column flexbox with background, padding, radius.</p>
+
+  <h2><span class="task-badge">6</span>Show descriptions checkbox</h2>
+  <p>Checkbox + label above the grid. <code>change</code> listener selects descriptions <em>inside the handler</em> and toggles a class on all of them.</p>
+
+  <h2><span class="task-badge">7</span>Git workflow</h2>
+  <p>Optional for the mock — if you want the full drill, <code>git init</code> the starter folder and commit after each task with a real message.</p>
+
+</main>
+
+<footer class="site">Mock Practice Run · <a href="../index.html">Back to hub</a></footer>
+</body>
+</html>
